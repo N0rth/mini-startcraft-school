@@ -1,0 +1,29 @@
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  min-height: 10vh;
+  background-color: rgba(204,116,20, 1);
+}
+
+header nav ul:after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+header nav ul li {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+header nav ul li:hover {
+  background-color: rgba(50,90,255, 1);
+}
+
+main {
+  margin-top: 12vh;
+}
