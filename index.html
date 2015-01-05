@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>The Collector</title>
+    <meta charset="utf-8">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+  </head>
+  <body>
+    <header>
+      <nav>
+        <!-- <ul>
+          <li id="newStory">Start new story.</li>
+          <li id="playNextEvent">Next event.</li>
+          <li id="action">Action.</li>
+          <li id="status">Status.</li>
+          <li id="startOver">Start over.</li>
+        </ul> -->
+      </nav>  
+    </header>
+    <main>
+    
+      <table width="100%" border="0" cellpadding="5" cellspacing="3" style="font-size:24px;">
+  <tr>
+    <td width="159"><div class="storyStatus"></div></td>
+    <td width="939"><div align="center"><section class="storyEvent">Welcome to Game</section></div></td>
+    <td width="196" rowspan="2" valign="top"><div align="left"><div class="storyItem"></div></div></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td><div align="center"><section class="storyOptions">
+      Please select name and character
+      
+      
+    </section></div></td>
+    </tr>
+  
+  <tr>
+    <td>&nbsp;</td>
+    <td><div align="center"><div class="storyOptions1">Name : <input type="text" name="name" id="name" value=""></div></div></td>
+    <td>&nbsp;</td>
+  </tr>
+  
+  <tr>
+    <td>&nbsp;</td>
+    <td ><table id="user_select" width="100%" border="0" cellpadding="5" cellspacing="3" style="font-size:24px;">
+      <tr>
+        <td width="35%">&nbsp;</td>
+        <td width="11%">&nbsp;</td>
+        <td width="9%">&nbsp;</td>
+        <td width="10%">&nbsp;</td>
+        <td width="35%">&nbsp;</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td><div align="center">
+          <input type="submit" name="terrans" id="terrans" value="Play as Terrans">
+        </div></td>
+        <td><div align="center">
+          <input type="submit" name="zerg" id="zerg" value="Play as Zerg">
+        </div></td>
+        <td><div align="center">
+          <input type="submit" name="protoss" id="protoss" value="Play as Protoss">
+        </div></td>
+        <td>&nbsp;</td>
+      </tr>
+    </table>
+    
+        
+    </td>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+
+<table id="all_user_list" width="100%" border="0" cellpadding="5" cellspacing="3" style="font-size:18px;">
+        </table>
+
+      <article class="storyTelling">
+       </article>
+</main>
+    <div id="game_result">
+           <p>&nbsp;</p>
+      <p>&nbsp;</p>
+      <p>&nbsp;</p>
+    </div>
+  </body>
+</html>
