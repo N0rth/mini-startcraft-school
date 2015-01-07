@@ -28,7 +28,7 @@ class protoss extends Character {
    * Get Values For Protoss
    */
   public function get_values() {
-    	return array('protoss'=>array('name'=>$this->name,'health'=>$this->health,'stamina'=>$this->stamina,'strength'=>$this->strength,'speed'=>$this->speed,'success'=>$this->success));
+    	return array('protoss'=>array('name'=>$this->name,'health'=>$this->health,'stamina'=>$this->stamina,'strength'=>$this->strength,'speed'=>$this->speed,'success_point'=>$this->success));
   }
   /**
    * WinTool item For Protoss

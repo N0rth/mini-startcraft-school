@@ -16,7 +16,7 @@ class zerg extends Character {
 	/**
    	  * Set Values For Zerg
    	  */
-    parent::__construct('Zerg',100,50,10,30);
+    parent::__construct('Zerg',80,60,50,30);
     $this->name = parent::get_name();
 	$this->health = parent::get_health();
 	$this->stamina = parent::get_stamina();
@@ -28,7 +28,7 @@ class zerg extends Character {
    * Get Values For Zerg
    */
   public function get_values() {
-    	return array('zerg'=>array('name'=>$this->name,'health'=>$this->health,'stamina'=>$this->stamina,'strength'=>$this->strength,'speed'=>$this->speed,'success'=>$this->success));
+    	return array('zerg'=>array('name'=>$this->name,'health'=>$this->health,'stamina'=>$this->stamina,'strength'=>$this->strength,'speed'=>$this->speed,'success_point'=>$this->success));
   }
    /**
    * WinTool item For Zerg

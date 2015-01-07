@@ -286,7 +286,7 @@ $(function() {
     $(".storyOptions").append("<h2>"+eventData[0].challenge.title+"</h2>");
     $(".storyOptions").append("<p>"+eventData[0].challenge.description+"</p>");
 	
-	$(".storyItem").append("<p>Items : <br />"+eventData[0].item.title+"</p>");
+	$(".storyItem").append("<p>Items : <br />"+eventData[0].item[0].title+"</p>");
 	$(".storyStatus").append("<p>Status : "+eventData[0].point+"</p>");
 	$(".storyStatus").append("<p>Start Over</p>");
 	
@@ -300,23 +300,30 @@ $(function() {
   })
   
   
+  gameEnd = 0;
+  
    /**
    * function to play challenge
    *
    */
-  function playChallenge() {
+  function playChallenge(t) {
+	  if(gameEnd==0)
+	  {
 		//get current chapter event data from play_chapter.php
 		$.ajax({
 		  url: "play_chapter.php",
 		  dataType: "json",
 		  data: {
-  		    q:'play_challenge'
+  		    q:t
 		  },
 		  success: printPlayChallengeEventData,
 		  error: function(data) {
 			$("#game_result").html(data.responseText);
 		  }
 		});
+	  }
+	  else
+	  	alert("Game End");
   }
   
    /**
@@ -344,7 +351,7 @@ $(function() {
 	$("#all_user_list").append("<tbody>");
 	
 	if(playChallengeCount==1){
-		$("#all_user_list").append('<tr><td valign="top"><strong>User</strong></td><td valign="top">&nbsp;</td><td>&nbsp;</td><td><strong>Challenge Property Left</strong></td><td>&nbsp;</td><td>&nbsp;</td></tr>');
+		$("#all_user_list").append('<tr><td valign="top"><strong>User</strong></td><td valign="top">&nbsp;</td><td><strong>Items</strong></td><td><strong>Challenge Property Left</strong></td><td>&nbsp;</td><td>&nbsp;</td></tr>');
 	}
  
 	
@@ -357,6 +364,7 @@ $(function() {
 	var challengePropertyValue;
 	var checkWin = 0;
 	var eresult;
+	var item_list;
 	//console.log(eventData[0].length);
 	
 	for (var i = 0; i < eventData[0].length; i++) {
@@ -380,24 +388,58 @@ $(function() {
 	 }else{challengePropertyValue = 0; }
 	 
 	 
-	if(eventData[0][i].user.result=='won'){
- 		checkWin = 1;
-		eresult = 'won';
-	}else{ eresult ='lose'  }
- 
+	 	console.log( "success point = "+ eventData[0][i].user.success_point);
+	
+		if(eventData[0][i].user.result=='won'){
+			checkWin = 1;
+			eresult = 'won the game';
+		}else{ eresult ='lose the game'  }
+	 	 
+	
  	  if(i==0){
 	  	userName = ' ( '+eventData[0][0].name+' ) ';
 	  }
- 	 $("#all_user_list").append('<tr><td width="20%" valign="top">'+eventData[0][i].user.name+' '+userName+' : </td>\
-	 								<td width="10%" valign="top">'+eventData[1].challenge_property+' : '+userProperty+'</td><td width="8%"></td>\
-        							<td width="8%">'+eventData[1].challenge_property+' : '+challengePropertyValue+'</td><td width="18%"> '+eresult+' the game</td><td width="23%">&nbsp;</td>\
+	  
+	  
+	  //for item display
+	  //console.log( "Item count = " +eventData[0][i].user.name+ " : " + eventData[0][i].item.length);
+	  item_list = '';
+	  for (var j = 0; j < eventData[0][i].item.length; j++) {
+		  
+		  item_list += "<p>";
+		  if(typeof eventData[0][i].item[j].title!='undefined'){
+			item_list += "<span>"+eventData[0][i].item[j].title + "</span><br />";  
+		  }
+		  else{
+ 		  	item_list += "<span>No item found</span><br />";
+		  }
+		  item_list += "</p><br />";
+		  
+		  //console.log(eventData[0][i].item[j].title);
+	  }
+	  console.log(item_list);
+	  
+	  
+	  
+ 	 $("#all_user_list").append('<tr><td width="10%" valign="top">'+eventData[0][i].user.name+' '+userName+' : </td>\
+	 								<td width="10%" valign="top">'+eventData[1].challenge_property+' : '+userProperty+'</td><td width="8%">'+item_list+'</td>\
+        							<td width="17%">'+eventData[1].challenge_property+' : '+challengePropertyValue+'</td><td width="18%"> '+eresult+'   ('+eventData[0][i].user.position+') > ('+eventData[0][i].user.success_point+')</td><td width="23%">&nbsp;</td>\
 								 </tr>');
 		
 		userName = '';
 		userProperty = '';	
 		//challengeProperty = '';	
 		challengePropertyValue = '';
-		eresult = '';				 
+		eresult = '';
+		item_list = '';		
+		
+		
+		if(eventData[0][i].user.success_point>=100) 
+		{ gameEnd = 1; }
+		else{}
+		
+		console.log(eventData[0][i].user.success_point);
+			 
     } 
 	
 	$("#all_user_list").append('<tr><td colspan="6" valign="top">&nbsp;</td></tr>');
@@ -407,8 +449,14 @@ $(function() {
 	if(checkWin==0){
 		$(".storyOptions").append('<input type="submit" name="play_challenge" id="play_challenge" value="Play Again">');
 	}
+	else{
+		$(".storyOptions").append('<input type="submit" name="next_challenge" id="next_challenge" value="Next Challenge">');
+	}
  	playChallengeCount++;
- 
+ 	
+	
+	console.log(gameEnd);
+	
 	
 /*	$(".storyItem").append("<p>Items : <br />"+eventData[0].item.title+"</p>");
 	if(typeof eventData[0].item.stamina!='undefined'){
@@ -463,6 +511,10 @@ $(function() {
   }
   $(document).on('click', '#play_challenge', function()
   {
-		playChallenge();
+		playChallenge('play_challenge');
+  })
+  $(document).on('click', '#next_challenge', function()
+  {
+		playChallenge('next_challenge');
   })
 });

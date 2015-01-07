@@ -16,7 +16,7 @@ class terrans extends Character {
 	/**
    	  * Set Values For Terrans
    	  */
-    parent::__construct('Terrans',100,40,30,20);
+    parent::__construct('Terrans',90,50,40,20);
     $this->name = parent::get_name();
 	$this->health = parent::get_health();
 	$this->stamina = parent::get_stamina();
@@ -29,7 +29,7 @@ class terrans extends Character {
    * Get Values For Terrans
    */
   public function get_values() {
-    	return array('terrans'=>array('name'=>$this->name,'health'=>$this->health,'stamina'=>$this->stamina,'strength'=>$this->strength,'speed'=>$this->speed,'success'=>$this->success));
+    	return array('terrans'=>array('name'=>$this->name,'health'=>$this->health,'stamina'=>$this->stamina,'strength'=>$this->strength,'speed'=>$this->speed,'success_point'=>$this->success));
   }
   /**
    * WinTool item For Terrans

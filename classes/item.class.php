@@ -7,7 +7,12 @@ class item{
 							  array( 'title' => "Item 1",'strength' => 100),
 							  array( 'title' => "Item 2",'speed' => 90),
 							  array( 'title' => "Item 3",'stamina' => 80),
-							  array( 'title' => "Item 4",'health' => 70)
+							  array( 'title' => "Item 4",'health' => 70),
+							  array( 'title' => "Item 5",'strength' => 90),
+							  array( 'title' => "Item 6",'speed' => 80),
+							  array( 'title' => "Item 7",'stamina' => 70),
+							  array( 'title' => "Item 8",'health' => 100)
+							  
 						   );
     }
    /**
@@ -17,10 +22,14 @@ class item{
     	$itemList = $this->item;
 		foreach($this->item as $item){
 			if(isset($item[$key])){
+				$randomItems[] = $item;
+			}
+			/*if(isset($item[$key])){
 				return $item;
 				break;
-			}
+			}*/
 		}
+		return $randomItems[array_rand($randomItems,1)];
 		//return $this->item[array_rand($this->item,1)];
   }
 }
