@@ -99,17 +99,32 @@ else if($q=='play_challenge' || $q=='next_challenge')
 					//decrease user property with challenge property and updating result
 					$decreaseProperty = ($challenge_property['value']-$gerUserProperty['value']);
 					if(($decreaseProperty)<=0){
-						$_SESSION[$seesionKey][0]['challenge'][$challenge_property['property']] = 0;
+						@$_SESSION[$seesionKey][0]['challenge'][$challenge_property['property']] = 0;
+						if(@$_SESSION[$seesionKey][1]!=NULL){
+							$_SESSION[$seesionKey][1]['challenge'][$challenge_property['property']] = 0;
+						}
+						if(@$_SESSION[$seesionKey][2]!=NULL){
+							$_SESSION[$seesionKey][2]['challenge'][$challenge_property['property']] = 0;
+						}
+						
 						$_SESSION[$seesionKey][$j]['user']['result'] = 'won';
 						$_SESSION[$seesionKey][$j]['user']['temp_challenge_value'] = 0;
 						//remove temp challenge values
-						remove_remain_users($j);
+						remove_users_temp_values($j);
 						//remove temp challenge values
 						set_users_position($challenge_property['property'],$j);
 						break;
 					}
 					else{
-						$_SESSION[$seesionKey][0]['challenge'][$challenge_property['property']] = $decreaseProperty;
+						@$_SESSION[$seesionKey][0]['challenge'][$challenge_property['property']] = $decreaseProperty;
+						
+						if(@$_SESSION[$seesionKey][1]!=NULL){
+							$_SESSION[$seesionKey][1]['challenge'][$challenge_property['property']] = $decreaseProperty;
+						}
+						if(@$_SESSION[$seesionKey][2]!=NULL){
+							$_SESSION[$seesionKey][2]['challenge'][$challenge_property['property']] = $decreaseProperty;
+						}
+						
 						$_SESSION[$seesionKey][$j]['user']['temp_challenge_value'] = $_SESSION[$seesionKey][0]['challenge'][$challenge_property['property']];
 						//player loose the game
 						$_SESSION[$seesionKey][$j]['user']['result'] = 'lose';

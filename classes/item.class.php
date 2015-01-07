@@ -20,16 +20,16 @@ class item{
    */
   public function get_items_list($key) {
     	$itemList = $this->item;
-		foreach($this->item as $item){
-			if(isset($item[$key])){
-				$randomItems[] = $item;
-			}
-			/*if(isset($item[$key])){
-				return $item;
-				break;
-			}*/
+ 		if($key==false){
+			return $this->item[array_rand($this->item,1)];
 		}
-		return $randomItems[array_rand($randomItems,1)];
-		//return $this->item[array_rand($this->item,1)];
-  }
+		else{
+			foreach($this->item as $item){
+				if(isset($item[$key])){
+					$randomItems[] = $item;
+				}
+			}
+			return $randomItems[array_rand($randomItems,1)];
+		}
+   }
 }

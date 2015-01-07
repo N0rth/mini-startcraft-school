@@ -97,22 +97,31 @@ function get_user_property($s,$property)
 			break;
 		}
 }
-//Remove remain users
-function remove_remain_users($i)
+//Remove users temp challenge values with temp challenge value and user result
+function remove_users_temp_values($i)
 {
 	global $seesionKey;	
 	if($i==0){
 		//unset($_SESSION[$seesionKey][1]['user']['temp_challenge_value']);
 		//unset($_SESSION[$seesionKey][2]);
-		$_SESSION[$seesionKey][1]['user']['temp_challenge_value'] = 0;
-		$_SESSION[$seesionKey][2]['user']['temp_challenge_value'] = 0;
+		if(@$_SESSION[$seesionKey][1]!=NULL){
+			$_SESSION[$seesionKey][1]['user']['temp_challenge_value'] = 0;
+			//$_SESSION[$seesionKey][1]['user']['result'] = '';
+		}
+		
+		if(@$_SESSION[$seesionKey][2]!=NULL){
+			$_SESSION[$seesionKey][2]['user']['temp_challenge_value'] = 0;
+			//$_SESSION[$seesionKey][2]['user']['result'] = '';
+		}
 	}
 	else if($i==1){
 		//unset($_SESSION[$seesionKey][2]);
-		$_SESSION[$seesionKey][2]['user']['temp_challenge_value'] = 0;
+		
+		if(@$_SESSION[$seesionKey][2]!=NULL){
+			$_SESSION[$seesionKey][2]['user']['temp_challenge_value'] = 0;
+			//$_SESSION[$seesionKey][2]['user']['result'] = '';
+		}
 	}
-	
-	
 }
 
 //Set user position based on challenge property
@@ -125,29 +134,37 @@ function set_users_position($challenge_property,$i)
 	{
 		if($i==$j){
 			$_SESSION[$seesionKey][$i]['user']['position'] = 1;
+			//if user win add new item
+			winTool($i);
 		}
 		else{
 			$remain_user[] = $j;
 		}
 		$j++;
 	}
-	if($_SESSION[$seesionKey][$remain_user[0]]['user'][$challenge_property]>$_SESSION[$seesionKey][$remain_user[1]]['user'][$challenge_property]){
-			$_SESSION[$seesionKey][$remain_user[0]]['user']['position'] = 2;
-			//unset($_SESSION[$seesionKey][$remain_user[0]]['item'][end($_SESSION[$seesionKey][$remain_user[0]]['item'])]);
-	}
-	else{
-		$_SESSION[$seesionKey][$remain_user[0]]['user']['position'] = 3;
-	}
-
-	if($_SESSION[$seesionKey][$remain_user[1]]['user'][$challenge_property]>$_SESSION[$seesionKey][$remain_user[0]]['user'][$challenge_property]){
-			$_SESSION[$seesionKey][$remain_user[1]]['user']['position'] = 2;
-	}
-	else{
-		$_SESSION[$seesionKey][$remain_user[1]]['user']['position'] = 3;
+	
+	if(@$_SESSION[$seesionKey][$remain_user[0]]!=NULL){
+		
+		if(@$_SESSION[$seesionKey][$remain_user[0]]['user'][@$challenge_property]>@$_SESSION[$seesionKey][$remain_user[1]]['user'][@$challenge_property]){
+				$_SESSION[$seesionKey][$remain_user[0]]['user']['position'] = 2;
+				//unset($_SESSION[$seesionKey][$remain_user[0]]['item'][end($_SESSION[$seesionKey][$remain_user[0]]['item'])]);
+		}
+		else{
+			$_SESSION[$seesionKey][$remain_user[0]]['user']['position'] = 3;
+		}
 	}
 	
-	//lose_item($remain_user);
-	//return $_SESSION[$seesionKey];
+	if(@$_SESSION[$seesionKey][$remain_user[1]]!=NULL){
+		if(@$_SESSION[$seesionKey][$remain_user[1]]['user'][$challenge_property]>@$_SESSION[$seesionKey][$remain_user[0]]['user'][$challenge_property]){
+				$_SESSION[$seesionKey][$remain_user[1]]['user']['position'] = 2;
+		}
+		else{
+			$_SESSION[$seesionKey][$remain_user[1]]['user']['position'] = 3;
+		}
+	}
+	
+	//remove item if user lose
+	loseTool(@$remain_user);
 	#return $reamin_user;	
 }
 
@@ -185,6 +202,13 @@ function set_challenge_property_value($property,$value)
 	return array('challenge_property'=>$property,'challenge_value'=>$value);
 }
 
+//reindex user session
+function reindex_user_session()
+{
+	global $seesionKey;
+	$_SESSION[$seesionKey] = array_values($_SESSION[$seesionKey]);
+}
+
 //increase and decrease success point
 function increase_decrease_success_point($challengeType)
 {
@@ -196,40 +220,67 @@ function increase_decrease_success_point($challengeType)
 	{	
 	
  		global $seesionKey;
+		
+	  		
+		//checking success point limit stop increase and decrease if user success point reach 0 or 100
 		$j=0;
 		while($j<sizeof($_SESSION[$seesionKey]))
 		{
-			$getPos = $_SESSION[$seesionKey][$j]['user']['position'];
+			$userSuccessPoint = @$_SESSION[$seesionKey][$j]['user']['success_point'];
+			if($userSuccessPoint==0 || $userSuccessPoint>=100){
+				//$_SESSION[$seesionKey][$j]['user']['success_point'] = "REMOVE THIS USER";
+				$_SESSION[$seesionKey][$j] = '';
+				unset($_SESSION[$seesionKey][$j]);
+ 			}
+			unset($userSuccessPoint);
+			$j++;	
+		}
+		
+		reindex_user_session();
+  
+ 		$j=0;
+		while($j<sizeof($_SESSION[$seesionKey]))
+		{
+			$getPos = @$_SESSION[$seesionKey][$j]['user']['position'];
+			$userSuccessPoint = @$_SESSION[$seesionKey][$j]['user']['success_point'];
 			//get success point with position and match users position
-	 		foreach($successPoints as $points)
+			foreach($successPoints as $points)
 			{
-				if($points['position']==$getPos){
-					if ($points['point']>0){
-						 $_SESSION[$seesionKey][$j]['user']['success_point'] = ($_SESSION[$seesionKey][$j]['user']['success_point'] + $points['point']);
+					if($points['position']==$getPos){
+						if ($points['point']>0){
+							 $_SESSION[$seesionKey][$j]['user']['success_point'] = ($userSuccessPoint + $points['point']);
+						}
+						else{
+							 $_SESSION[$seesionKey][$j]['user']['success_point'] = ($userSuccessPoint - (abs($points['point'])));
+ 						}
 					}
-					else{
-						 $_SESSION[$seesionKey][$j]['user']['success_point'] = ($_SESSION[$seesionKey][$j]['user']['success_point'] - (abs($points['point'])));
-					}
-				}
 			}
+			unset($userSuccessPoint);
 			unset($getPos);
 			$j++;	
 		}
 	}
 }
-
-function winTool()
+//Add new random item when user win in session
+function winTool($i)
 {
-	
+	global $seesionKey;
+	$userItems = new item();
+	//get random item
+	$newItem = $userItems->get_items_list(false);
+	if($newItem!=NULL){
+		$_SESSION[$seesionKey][$i]['item'][] = $newItem;
+	}
 }
-//lose items
-function lose_item($remain_user)
+//Remove item when user lose in session
+function loseTool($remain_user)
 {
 	global $seesionKey;
 	//calcuate user property
 	$j=0;
 	while($j<sizeof($remain_user))
 	{
+		//return $_SESSION[$seesionKey][$remain_user[$j]]['item'];
 		unset($_SESSION[$seesionKey][$remain_user[$j]]['item'][(count($_SESSION[$seesionKey][$remain_user[$j]]['item'])-1)]);
 		$j++;	
 	}
