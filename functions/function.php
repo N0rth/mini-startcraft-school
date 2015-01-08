@@ -1,4 +1,5 @@
 <?php
+error_reporting(0);
 //require user classes for user and item
 require_once("classes/terrans.class.php");
 require_once("classes/zerg.class.php");
@@ -70,7 +71,7 @@ function set_session($key,$value)
 //Get session values by key
 function get_session($key)
 {
-	return $_SESSION[$key];
+	return @$_SESSION[$key];
 }
 
 //get challenge property name
@@ -102,16 +103,18 @@ function remove_users_temp_values($i)
 {
 	global $seesionKey;	
 	if($i==0){
+		//unset($_SESSION[$seesionKey]);
+		
 		//unset($_SESSION[$seesionKey][1]['user']['temp_challenge_value']);
 		//unset($_SESSION[$seesionKey][2]);
 		if(@$_SESSION[$seesionKey][1]!=NULL){
 			$_SESSION[$seesionKey][1]['user']['temp_challenge_value'] = 0;
-			//$_SESSION[$seesionKey][1]['user']['result'] = '';
+			$_SESSION[$seesionKey][1]['user']['result'] = '';
 		}
 		
 		if(@$_SESSION[$seesionKey][2]!=NULL){
 			$_SESSION[$seesionKey][2]['user']['temp_challenge_value'] = 0;
-			//$_SESSION[$seesionKey][2]['user']['result'] = '';
+			$_SESSION[$seesionKey][2]['user']['result'] = '';
 		}
 	}
 	else if($i==1){
@@ -119,7 +122,7 @@ function remove_users_temp_values($i)
 		
 		if(@$_SESSION[$seesionKey][2]!=NULL){
 			$_SESSION[$seesionKey][2]['user']['temp_challenge_value'] = 0;
-			//$_SESSION[$seesionKey][2]['user']['result'] = '';
+			$_SESSION[$seesionKey][2]['user']['result'] = '';
 		}
 	}
 }
@@ -130,7 +133,7 @@ function set_users_position($challenge_property,$i)
 	global $seesionKey;
 	//calcuate user property
 	$j=0;
-	while($j<sizeof($_SESSION[$seesionKey]))
+	while($j<sizeof(@$_SESSION[$seesionKey]))
 	{
 		if($i==$j){
 			$_SESSION[$seesionKey][$i]['user']['position'] = 1;
@@ -206,7 +209,9 @@ function set_challenge_property_value($property,$value)
 function reindex_user_session()
 {
 	global $seesionKey;
-	$_SESSION[$seesionKey] = array_values($_SESSION[$seesionKey]);
+	if(@$_SESSION[$seesionKey]!=NULL){
+		$_SESSION[$seesionKey] = array_values(@$_SESSION[$seesionKey]);
+	}
 }
 
 //increase and decrease success point
@@ -221,16 +226,32 @@ function increase_decrease_success_point($challengeType)
 	
  		global $seesionKey;
 		
+		
+		//check if real user win remove all session
+		$j=0;
+		while($j<sizeof(@$_SESSION[$seesionKey]))
+		{
+			$userSuccessPoint = @$_SESSION[$seesionKey][$j]['user']['success_point'];
+			if($userSuccessPoint<=0 || $userSuccessPoint>=100){
+				if($_SESSION[$seesionKey][$j]['slug_name']==$_SESSION['real_user_name']['slug_name']){
+						unset($_SESSION[$seesionKey]);
+				}
+ 			}
+			unset($userSuccessPoint);
+			$j++;	
+		}
+		
+		
 	  		
 		//checking success point limit stop increase and decrease if user success point reach 0 or 100
 		$j=0;
-		while($j<sizeof($_SESSION[$seesionKey]))
+		while($j<sizeof(@$_SESSION[$seesionKey]))
 		{
 			$userSuccessPoint = @$_SESSION[$seesionKey][$j]['user']['success_point'];
-			if($userSuccessPoint==0 || $userSuccessPoint>=100){
-				//$_SESSION[$seesionKey][$j]['user']['success_point'] = "REMOVE THIS USER";
-				$_SESSION[$seesionKey][$j] = '';
-				unset($_SESSION[$seesionKey][$j]);
+			if($userSuccessPoint<=0 || $userSuccessPoint>=100){
+					//$_SESSION[$seesionKey][$j]['user']['success_point'] = "REMOVE THIS USER";
+					$_SESSION[$seesionKey][$j] = '';
+					unset($_SESSION[$seesionKey][$j]);
  			}
 			unset($userSuccessPoint);
 			$j++;	
@@ -239,7 +260,7 @@ function increase_decrease_success_point($challengeType)
 		reindex_user_session();
   
  		$j=0;
-		while($j<sizeof($_SESSION[$seesionKey]))
+		while($j<sizeof(@$_SESSION[$seesionKey]))
 		{
 			$getPos = @$_SESSION[$seesionKey][$j]['user']['position'];
 			$userSuccessPoint = @$_SESSION[$seesionKey][$j]['user']['success_point'];
@@ -268,7 +289,7 @@ function winTool($i)
 	$userItems = new item();
 	//get random item
 	$newItem = $userItems->get_items_list(false);
-	if($newItem!=NULL){
+	if($newItem!=NULL && (count($_SESSION[$seesionKey][$i]['item'])<3)){
 		$_SESSION[$seesionKey][$i]['item'][] = $newItem;
 	}
 }
@@ -286,4 +307,21 @@ function loseTool($remain_user)
 	}
 }
 
+//play together decrease success point
+function play_challenge_together()
+{
+		global $seesionKey;
+		if($_SESSION[$seesionKey][0]!=NULL && $_SESSION[$seesionKey][1]!=NULL){
+        	$_SESSION[$seesionKey][0]['user']['success_point'] = ($_SESSION[$seesionKey][0]['user']['success_point']-5);
+			$_SESSION[$seesionKey][1]['user']['success_point'] = ($_SESSION[$seesionKey][1]['user']['success_point']-5);
+		}
+}
+//decrease user success point new challenge
+function new_challenge()
+{
+		global $seesionKey;
+		if($_SESSION[$seesionKey][0]!=NULL){
+        	$_SESSION[$seesionKey][0]['user']['success_point'] = ($_SESSION[$seesionKey][0]['user']['success_point']-5);
+		}
+}
 ?>

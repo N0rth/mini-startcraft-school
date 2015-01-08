@@ -281,12 +281,30 @@ $(function() {
 	$(".storyOptions").html("");
 	$(".storyOptions1").html("");
 	$("#user_select").html("");
+	$(".storyItem").html("");
 
     $(".storyEvent").html("Welcome to Random Challenge ("+eventData[0].user.name+")");
     $(".storyOptions").append("<h2>"+eventData[0].challenge.title+"</h2>");
     $(".storyOptions").append("<p>"+eventData[0].challenge.description+"</p>");
 	
-	$(".storyItem").append("<p>Items : <br />"+eventData[0].item[0].title+"</p>");
+ 	if(typeof eventData[0].challenge.stamina!='undefined'){
+		$(".storyOptions").append("<p>stamina :"+eventData[0].challenge.stamina+"</p>");
+	}
+	if(typeof eventData[0].challenge.health!='undefined'){
+		$(".storyOptions").append("<p>health :"+eventData[0].challenge.health+"</p>");
+	}
+	if(typeof eventData[0].challenge.strength!='undefined'){
+		$(".storyOptions").append("<p>strength :"+eventData[0].challenge.strength+"</p>");
+	}
+	if(typeof eventData[0].challenge.speed!='undefined'){
+		$(".storyOptions").append("<p>speed :"+eventData[0].challenge.speed+"</p>");
+	}
+	
+	if(typeof eventData[0].item[0]!='undefined'){
+		$(".storyItem").append("<p><strong>Item</strong>("+eventData[0].item.length+")<br />"+eventData[0].item[0].title+" </p>");
+	}
+	
+	$(".storyStatus").html("");
 	$(".storyStatus").append("<p>Status : "+eventData[0].point+"</p>");
 	$(".storyStatus").append("<p>Start Over</p>");
 	
@@ -307,8 +325,8 @@ $(function() {
    *
    */
   function playChallenge(t) {
-	  if(gameEnd==0)
-	  {
+	  //if(gameEnd==0)
+	  //{
 		//get current chapter event data from play_chapter.php
 		$.ajax({
 		  url: "play_chapter.php",
@@ -321,9 +339,12 @@ $(function() {
 			$("#game_result").html(data.responseText);
 		  }
 		});
-	  }
-	  else
-	  	alert("Game End");
+		
+		console.log("ajax Playclicked");
+		
+	  //}
+	  //else
+	  //	alert("Game End");
   }
   
    /**
@@ -333,15 +354,18 @@ $(function() {
   playChallengeCount = 1;
   function printPlayChallengeEventData(eventData) {
 	  
- 	console.log(eventData[0]);
+ 	//console.log(eventData[0]);
 	  
-	console.log(eventData[0].length);
+	//console.log("last jmj wwwwwwwwwww");
+	//console.log(eventData[0].length);
+	
+	//console.log("last jmj" + eventData[0]);
 	
 	
 	//check if user has left for play game
-	if(eventData[0].length==0)
+	if(typeof eventData[0]=='undefined' || eventData[0]==0)
   	{
-		alert("no one has left for play game");
+		alert("Game End");
 	}
 	else{
 	
@@ -356,9 +380,23 @@ $(function() {
 		
 		 
 		$(".storyOptions").append("<p>"+eventData[1].challenge_property+" : "+eventData[1].challenge_value+"</p>");
+		//display items list
 		
-		
-		
+		console.log(eventData[0][0].item.length);
+		$(".storyItem").html("");
+		var itemDetail = '';
+		for (var j = 0; j < eventData[0][0].item.length; j++) {
+			  if(typeof eventData[0][0].item[j].title!='undefined'){
+				itemDetail += "<span>"+eventData[0][0].item[j].title + "</span><br />";
+			  }
+			  else{
+				itemDetail += "<span>No item found</span>";
+			  }
+		}
+		$(".storyItem").html("<p><strong>Items</strong>("+eventData[0][0].item.length+")<br />"+itemDetail+"</p>");
+		itemDetail='';
+			  
+ 		
 		$("#all_user_list").append("<tbody>");
 		
 		$("#all_user_list").append('<tr><td colspan="6" valign="top">'+eventData[0][0].challenge.title+' ('+eventData[1].challenge_property+" : "+eventData[1].challenge_value+')</td></tr>');
@@ -378,8 +416,11 @@ $(function() {
 		var checkWin = 0;
 		var eresult;
 		var item_list;
-		
+		 
 		//console.log(eventData[0].length);
+		
+		//console.log("user length : " + eventData[0].length);
+		
 		
 		for (var i = 0; i < eventData[0].length; i++) {
 			
@@ -412,6 +453,8 @@ $(function() {
 		
 		  if(i==0){
 			userName = ' ( '+eventData[0][0].name+' ) ';
+			$(".storyStatus").html("<p>Status : "+eventData[0][0].user.success_point+"</p>");
+			$(".storyStatus").append("<p>Start Over</p>");
 		  }
 		  
 		  
@@ -467,6 +510,12 @@ $(function() {
 		//console.log(checkWin);
 		if(checkWin==0){
 			$(".storyOptions").append('<input type="submit" name="play_challenge" id="play_challenge" value="Play Again">');
+			
+			if(eventData[0].length==1){
+			}else{
+				$(".storyOptions").append('<input type="submit" name="play_challenge_together" id="play_challenge_together" value="Play Challenge Together">');
+			}
+			
 		}
 		else{
 			$(".storyOptions").append('<input type="submit" name="next_challenge" id="next_challenge" value="Next Challenge">');
@@ -536,9 +585,20 @@ $(function() {
   $(document).on('click', '#play_challenge', function()
   {
 		playChallenge('play_challenge');
+		
   })
   $(document).on('click', '#next_challenge', function()
   {
 		playChallenge('next_challenge');
+		chooseChallenge();
+  })
+  $(document).on('click', '#play_challenge_together', function()
+  {
+		playChallenge('play_challenge_together');
+  })
+  $(document).on('click', '#new_challenge', function()
+  {
+		playChallenge('new_challenge');
+		chooseChallenge();
   })
 });

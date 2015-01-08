@@ -55,7 +55,9 @@ if($q=='start')
 		//set session for selected challange
 		set_session('user_challenge',$challenges_list);
 		
-		echo json_encode($challenges_list);
+		//set real user slug name
+		set_session('real_user_name',array("slug_name"=>$slug_name));
+ 		echo json_encode($challenges_list);
 }
 else if($q=='choose_challenge')
 {
@@ -67,16 +69,22 @@ else if($q=='choose_challenge')
 		#echo "</pre>";
 
 }
-else if($q=='play_challenge' || $q=='next_challenge')
+else if($q=='play_challenge' || $q=='next_challenge__jmj' || $q=='play_challenge_together')
 {	
 			//session key
 			$seesionKey = 'user_session';
 		
+			$challengeType = 'carryOutChallenge';
 			if($q=='play_challenge'){
 				
 			}
-			else if($q=='next_challenge'){
+			else if($q=='next_challenge__jmj'){
+				//set random challenge
 				set_new_random_challenge();
+			}
+			else if($q=='play_challenge_together'){
+				play_challenge_together();
+  				$challengeType = 'carryOutChallengeWithCompanion';
 			}
 			//get user session details
 			$getUsers = get_session($seesionKey);
@@ -128,6 +136,12 @@ else if($q=='play_challenge' || $q=='next_challenge')
 						$_SESSION[$seesionKey][$j]['user']['temp_challenge_value'] = $_SESSION[$seesionKey][0]['challenge'][$challenge_property['property']];
 						//player loose the game
 						$_SESSION[$seesionKey][$j]['user']['result'] = 'lose';
+						
+						//if($_SESSION[$seesionKey][$j]['slug_name']==$_SESSION['real_user_name']['slug_name']){
+						//	$_SESSION[$seesionKey][$j]['user']['position'] = 0;
+						//}
+						
+						
 					}
 	
 					
@@ -148,7 +162,7 @@ else if($q=='play_challenge' || $q=='next_challenge')
 			
 			//var_dump(increase_decrease_success_point('carryOutChallenge'));
 			//increase and decrease success point based on user position
-			increase_decrease_success_point('carryOutChallenge');
+			increase_decrease_success_point($challengeType);
 			
 			
 			
@@ -160,7 +174,14 @@ else if($q=='play_challenge' || $q=='next_challenge')
 		$challenge_property_data = get_challenge_property(get_session('user_challenge'));
  		
 		//get user session details
-		$getUsers = array_merge(array(array_values(get_session($seesionKey))),array(set_challenge_property_value($challenge_property_data['property'],$challenge_property_data['value'])));
+		$getUserSessionArray = get_session($seesionKey);
+		if($getUserSessionArray!=NULL){
+			$getUsers = array_merge(array(array_values(get_session($seesionKey))),array(set_challenge_property_value($challenge_property_data['property'],$challenge_property_data['value'])));
+			echo json_encode($getUsers);
+		}
+		else{
+			echo json_encode(array("real_user_won"=>true));
+		}
 		//$getUsers = array_merge(get_session($seesionKey),array('challenge_property'=>$challenge_property_data['property']));
 		
 		#var_dump($getUsers);
@@ -169,6 +190,17 @@ else if($q=='play_challenge' || $q=='next_challenge')
 		#echo "<pre>";
 		#print_r($getUsers);
 		#echo "</pre>";
-		echo json_encode($getUsers);
+		
+}
+else if($q=='new_challenge')
+{
+		//set random challenge
+		set_new_random_challenge();	
+		//decrease user success point
+		new_challenge();
+}
+else if($q=='next_challenge'){
+		//set random challenge
+		set_new_random_challenge();
 }
 ?>
